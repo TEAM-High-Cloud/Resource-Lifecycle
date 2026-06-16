@@ -1,3 +1,6 @@
+# secret key
+secrets.txt
+
 # Logs
 logs
 *.log
