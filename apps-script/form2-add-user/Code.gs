@@ -38,6 +38,20 @@ function onSubmit(e) {
     return;
   }
 
+  // 4. 추가할 유저 ID 영문+숫자 검증
+  if (!/^[a-zA-Z0-9]+$/.test(responses[4])) {
+    sheet.getRange(lastRow, 7).setValue("실패-ID오류");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 유저 추가 신청 실패*\n*사유:* 추가할 유저 ID는 영문과 숫자만 입력해주세요\n*추가할 유저 ID:* " + responses[4] })
+    });
+    return;
+  }
+
+
+
+
+
   sheet.getRange(lastRow, 7).setValue("대기중");
   sheet.getRange(lastRow, 8).setValue("미반납");
   sheet.getRange(lastRow, 9).setValue("재직중");
