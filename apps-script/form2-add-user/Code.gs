@@ -18,6 +18,16 @@ function onSubmit(e) {
     return;
   }
 
+  // 2. 성함 한글 검증
+  if (!/^[가-힣]+$/.test(responses[1])) {
+    sheet.getRange(lastRow, 7).setValue("실패-성함오류");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 유저 추가 신청 실패*\n*사유:* 자음과 모음이 조합된 한글이 아닙니다.\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
+
 
   sheet.getRange(lastRow, 7).setValue("대기중");
   sheet.getRange(lastRow, 8).setValue("미반납");
