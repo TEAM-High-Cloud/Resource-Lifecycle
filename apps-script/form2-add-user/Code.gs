@@ -82,6 +82,7 @@ function onSubmit(e) {
         return;
     }
 
+    // 8. 정상 신청
     sheet.getRange(lastRow, 7).setValue("대기중");
     sheet.getRange(lastRow, 8).setValue("미반납");
     sheet.getRange(lastRow, 9).setValue("재직중");
@@ -110,3 +111,26 @@ function onSubmit(e) {
     });
 }
 
+
+function isDuplicateUserId(projectName, newUserId) {
+    var createSheet = SpreadsheetApp.openById("<CREATE_SHEET_ID>").getActiveSheet();
+    var addSheet = SpreadsheetApp.openById("<ADD_SHEET_ID>").getActiveSheet();
+    var createData = createSheet.getDataRange().getValues();
+    var addData = addSheet.getDataRange().getValues();
+
+    for (var i = 1; i < createData.length; i++) {
+        if (createData[i][3] === projectName &&
+            String(createData[i][5]) === String(newUserId) &&
+            createData[i][8] === "승인" &&
+            createData[i][9] === "미반납" &&
+            createData[i][10] !== "탈퇴") return true;
+    }
+    for (var i = 1; i < addData.length; i++) {
+        if (addData[i][3] === projectName &&
+            String(addData[i][4]) === String(newUserId) &&
+            addData[i][6] === "승인" &&
+            addData[i][7] === "미반납" &&
+            addData[i][8] !== "탈퇴") return true;
+    }
+    return false;
+}
