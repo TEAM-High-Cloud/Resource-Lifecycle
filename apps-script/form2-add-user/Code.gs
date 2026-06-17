@@ -24,6 +24,8 @@ function onSubmit(e) {
     // 2. 성함 한글 검증
     if (!/^[가-힣]+$/.test(responses[1])) {
         sheet.getRange(lastRow, 7).setValue("실패-성함오류");
+        sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요.\n\n유저 추가 신청이 실패하였습니다.\n\n사유: 성함은 자음과 모음이 조합된 한글로 입력해주세요.\n입력하신 성함: " + responses[1] + "\n\n감사합니다.");
         UrlFetchApp.fetch(webhookUrl, {
         "method": "post", "contentType": "application/json",
         "payload": JSON.stringify({ "text": "*❌ 유저 추가 신청 실패*\n*사유:* 자음과 모음이 조합된 한글이 아닙니다.\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
