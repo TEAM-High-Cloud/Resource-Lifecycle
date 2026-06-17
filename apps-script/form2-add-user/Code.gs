@@ -8,6 +8,16 @@ function onSubmit(e) {
   if (sheet.getRange(lastRow, 7).getValue() !== "") return;
   var FAIL_SUBJECT = "[HighCloud] 유저 추가 신청 실패";
 
+  // 1. 개인정보 미동의
+  if (responses[5] === "미동의") {
+    sheet.getRange(lastRow, 7).setValue("실패-미동의");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 유저 추가 신청 실패*\n*사유:* 개인정보 수집·이용 미동의\n*신청 일시:* " + responses[0] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
+
 
   sheet.getRange(lastRow, 7).setValue("대기중");
   sheet.getRange(lastRow, 8).setValue("미반납");
