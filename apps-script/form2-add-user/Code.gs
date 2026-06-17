@@ -75,6 +75,8 @@ function onSubmit(e) {
     // 7. 중복 ID 체크
     if (isDuplicateUserId(responses[3], responses[4])) {
         sheet.getRange(lastRow, 7).setValue("실패-중복ID");
+        sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n유저 추가 신청이 실패하였습니다.\n\n사유: 해당 프로젝트에 이미 존재하는 유저 ID입니다.\n프로젝트명: " + responses[3] + "\n유저 ID: " + responses[4] + "\n\n감사합니다.");
         UrlFetchApp.fetch(webhookUrl, {
         "method": "post", "contentType": "application/json",
         "payload": JSON.stringify({ "text": "*❌ 유저 추가 신청 실패*\n*사유:* 해당 프로젝트에 이미 존재하는 ID\n*프로젝트명:* " + responses[3] + "\n*추가할 유저 ID:* " + responses[4] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
