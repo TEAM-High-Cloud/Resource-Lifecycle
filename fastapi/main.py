@@ -130,4 +130,3 @@ def create_project_and_user(req: CreateProjectRequest):
         raise
     except Exception as e:
         logger.error(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=str(e))
