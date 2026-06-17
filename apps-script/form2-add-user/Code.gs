@@ -65,6 +65,8 @@ function onSubmit(e) {
     // 6. 존재하지 않는 프로젝트에 유저 추가 신청했을 때
     if (projectStatus === "없음") {
         sheet.getRange(lastRow, 7).setValue("실패-없는프로젝트");
+        sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n유저 추가 신청이 실패하였습니다.\n\n사유: 존재하지 않는 프로젝트입니다.\n프로젝트명: " + responses[3] + "\n(프로젝트명은 승인 메일에 안내된 날짜 포함 이름으로 입력해주세요.)\n\n감사합니다.");
         UrlFetchApp.fetch(webhookUrl, {
         "method": "post", "contentType": "application/json",
         "payload": JSON.stringify({ "text": "*❌ 유저 추가 신청 실패*\n*사유:* 없는 프로젝트입니다\n*프로젝트명:* " + responses[3] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
