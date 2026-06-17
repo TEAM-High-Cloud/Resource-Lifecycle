@@ -111,6 +111,22 @@ function onSubmit(e) {
     });
 }
 
+// 거절/반납완료에서 조기반환하지 않고, 살아있는(승인+미반납)을 끝까지 탐색
+function getProjectStatus(projectName) {
+  var createSheet = SpreadsheetApp.openById("<CREATE_SHEET_ID>").getActiveSheet();
+  var data = createSheet.getDataRange().getValues();
+  var hasPending = false;
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][3] !== projectName) continue;
+    var approval = data[i][8];
+    var returned = data[i][9];
+    if (approval === "승인" && returned === "미반납") return "승인";
+    if (approval === "대기중") hasPending = true;
+  }
+  if (hasPending) return "대기중";
+  return "없음";
+}
+
 
 function isDuplicateUserId(projectName, newUserId) {
     var createSheet = SpreadsheetApp.openById("<CREATE_SHEET_ID>").getActiveSheet();
