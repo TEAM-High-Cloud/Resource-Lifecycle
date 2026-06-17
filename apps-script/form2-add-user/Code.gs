@@ -14,6 +14,8 @@ function onSubmit(e) {
     // 1. 개인정보 미동의
     if (responses[5] === "미동의") {
         sheet.getRange(lastRow, 7).setValue("실패-미동의");
+        sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n유저 추가 신청이 실패하였습니다.\n\n사유: 개인정보 수집·이용 미동의\n\n감사합니다.");
         UrlFetchApp.fetch(webhookUrl, {
         "method": "post", "contentType": "application/json",
         "payload": JSON.stringify({ "text": "*❌ 유저 추가 신청 실패*\n*사유:* 개인정보 수집·이용 미동의\n*신청 일시:* " + responses[0] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
