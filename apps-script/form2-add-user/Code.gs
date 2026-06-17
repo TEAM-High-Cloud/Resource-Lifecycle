@@ -48,7 +48,16 @@ function onSubmit(e) {
     return;
   }
 
-
+  // 5. 프로젝트 상태 체크 (responses[3] = 날짜 포함 전체 이름)
+  var projectStatus = getProjectStatus(responses[3]);
+  if (projectStatus === "대기중") {
+    sheet.getRange(lastRow, 7).setValue("실패-프로젝트대기중");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 유저 추가 신청 실패*\n*사유:* 프로젝트 승인 대기중입니다\n*프로젝트명:* " + responses[3] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
 
 
 
