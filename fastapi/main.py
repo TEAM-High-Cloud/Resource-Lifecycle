@@ -130,3 +130,47 @@ def create_project_and_user(req: CreateProjectRequest):
         raise
     except Exception as e:
         logger.error(traceback.format_exc())
+
+# ── Form 2: 기존 프로젝트에 유저 추가 ──────────────────────────────
+
+@app.post("/add-user")
+def add_user_to_project(req: AddUserRequest):
+    conn = get_conn()
+    try:
+        project = conn.identity.find_project(req.project_name)
+        if not project:
+            raise HTTPException(status_code=404, detail="프로젝트를 찾을 수 없습니다")
+
+        is_new_user = False
+        user = conn.identity.find_user(req.user_id)
+        if not user:
+            is_new_user = True
+            user = conn.identity.create_user(
+                name=req.user_id,
+                password=req.password,
+                email=req.email,
+                domain_id=get_domain_id(conn)
+            )
+
+        member_role = conn.identity.find_role("member")
+        if not member_role:
+            raise HTTPException(status_code=500, detail="member role이 존재하지 않습니다. CLI로 먼저 생성해주세요.")
+
+        conn.identity.assign_project_role_to_user(
+            project=project.id,
+            user=user.id,
+            role=member_role.id
+        )
+
+        return {
+            "status": "success",
+            "project_id": project.id,
+            "user_id": user.id,
+            "is_new_user": is_new_user
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
