@@ -28,6 +28,15 @@ function onSubmit(e) {
     return;
   }
 
+  // 3. 이메일 형식 검증
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(responses[2])) {
+    sheet.getRange(lastRow, 7).setValue("실패-이메일오류");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 유저 추가 신청 실패*\n*사유:* 이메일 형식이 올바르지 않습니다.\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
 
   sheet.getRange(lastRow, 7).setValue("대기중");
   sheet.getRange(lastRow, 8).setValue("미반납");
