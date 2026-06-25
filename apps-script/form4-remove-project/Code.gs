@@ -36,6 +36,28 @@ function onSubmit(e) {
     return;
   }
 
+  var projectStatus = getProjectStatus(responses[3]);
+  if (projectStatus === "대기중") {
+    sheet.getRange(lastRow, 8).setValue("실패-프로젝트대기중");
+    sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n프로젝트 삭제 신청이 실패하였습니다.\n\n사유: 프로젝트가 아직 승인 대기중입니다.\n프로젝트명: " + responses[3] + "\n\n감사합니다.");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 프로젝트 삭제 신청 실패*\n*사유:* 프로젝트 승인 대기중입니다\n*프로젝트명:* " + responses[3] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
+  if (projectStatus === "없음") {
+    sheet.getRange(lastRow, 8).setValue("실패-없는프로젝트");
+    sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n프로젝트 삭제 신청이 실패하였습니다.\n\n사유: 존재하지 않는 프로젝트입니다.\n프로젝트명: " + responses[3] + "\n\n감사합니다.");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 프로젝트 삭제 신청 실패*\n*사유:* 없는 프로젝트입니다\n*프로젝트명:* " + responses[3] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
+
   sheet.getRange(lastRow, 8).setValue("대기중");
 
   var blocks = [
