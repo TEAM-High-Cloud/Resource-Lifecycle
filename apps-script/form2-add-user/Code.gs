@@ -1,5 +1,4 @@
 function onSubmit(e) {
-    .
     var webhookUrl = "<SLACK_WEBHOOK_URL>";
     var botToken = "<SLACK_BOT_TOKEN>";
     var channelId = "<SLACK_CHANNEL_ID>";
