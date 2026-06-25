@@ -16,15 +16,34 @@ function sendEmailSafe(to, subject, body) {
   }
 }
 
+// 비밀번호 검증: FastAPI /verify-password 호출 → 맞으면 true
+function verifyPasswordViaAPI(fastapiUrl, userId, password) {
+  try {
+    var response = UrlFetchApp.fetch(fastapiUrl + "/verify-password", {
+      "method": "post",
+      "contentType": "application/json",
+      "payload": JSON.stringify({ "user_id": userId, "password": password }),
+      "muteHttpExceptions": true
+    });
+    var result = JSON.parse(response.getContentText());
+    return result.status === "success" && result.valid === true;
+  } catch (err) {
+    return false; // 통신 실패 시 삭제 차단 (fail-safe)
+  }
+}
+
 function onSubmit(e) {
   var webhookUrl = "<SLACK_WEBHOOK_URL>";
   var botToken = "<SLACK_BOT_TOKEN>";
   var channelId = "<SLACK_CHANNEL_ID>";
+  var fastapiUrl = "<FASTAPI_URL>";
   var responses = e.values;
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var lastRow = sheet.getLastRow();
   if (sheet.getRange(lastRow, 7).getValue() !== "") return;
   var FAIL_SUBJECT = "[HighCloud] 유저 삭제 신청 실패";
+
+  var inputPassword = responses[5];
 
   var projectStatus = getProjectStatus(responses[3]);
   if (projectStatus === "대기중") {
@@ -77,6 +96,17 @@ function onSubmit(e) {
     UrlFetchApp.fetch(webhookUrl, {
       "method": "post", "contentType": "application/json",
       "payload": JSON.stringify({ "text": "*❌ 유저 삭제 신청 실패*\n*사유:* 프로젝트 대표자는 유저 삭제로 탈퇴할 수 없습니다. 프로젝트 삭제 신청을 이용해주세요.\n*프로젝트명:* " + responses[3] + "\n*대표자 ID:* " + responses[4] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
+
+  if (!verifyPasswordViaAPI(fastapiUrl, responses[4], inputPassword)) {
+    sheet.getRange(lastRow, 7).setValue("실패-비번불일치");
+    sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n유저 삭제 신청이 실패하였습니다.\n\n사유: 비밀번호가 일치하지 않습니다.\n프로젝트명: " + responses[3] + "\n유저 ID: " + responses[4] + "\n\n감사합니다.");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 유저 삭제 신청 실패*\n*사유:* 비밀번호가 일치하지 않습니다\n*프로젝트명:* " + responses[3] + "\n*삭제할 유저 ID:* " + responses[4] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
     });
     return;
   }
