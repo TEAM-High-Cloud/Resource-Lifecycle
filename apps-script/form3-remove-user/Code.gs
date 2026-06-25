@@ -70,6 +70,17 @@ function onSubmit(e) {
     return;
   }
 
+  if (isProjectLeader(responses[3], responses[4])) {
+    sheet.getRange(lastRow, 7).setValue("실패-리더삭제불가");
+    sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n유저 삭제 신청이 실패하였습니다.\n\n사유: 프로젝트 대표자는 유저 삭제로 탈퇴할 수 없습니다. 프로젝트 삭제 신청을 이용해주세요.\n프로젝트명: " + responses[3] + "\n\n감사합니다.");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 유저 삭제 신청 실패*\n*사유:* 프로젝트 대표자는 유저 삭제로 탈퇴할 수 없습니다. 프로젝트 삭제 신청을 이용해주세요.\n*프로젝트명:* " + responses[3] + "\n*대표자 ID:* " + responses[4] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
+
   sheet.getRange(lastRow, 7).setValue("대기중");
 
   var blocks = [
@@ -138,4 +149,18 @@ function checkDeleteUserIdentity(projectName, userId, name, email) {
     }
   }
   return "not_found";
+}
+
+function isProjectLeader(projectName, userId) {
+  var createSheet = SpreadsheetApp.openById("<CREATE_SHEET_ID>").getActiveSheet();
+  var data = createSheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][3] === projectName &&
+        String(data[i][5]) === String(userId) &&
+        data[i][8] === "승인" &&
+        data[i][9] === "미반납") {
+      return true;
+    }
+  }
+  return false;
 }
