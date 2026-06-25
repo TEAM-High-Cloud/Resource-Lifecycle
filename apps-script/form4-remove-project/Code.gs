@@ -120,3 +120,19 @@ function getProjectStatus(projectName) {
   if (hasPending) return "대기중";
   return "없음";
 }
+
+function checkLeaderIdentity(projectName, leaderId, name, email) {
+  var createSheet = SpreadsheetApp.openById("<CREATE_SHEET_ID>").getActiveSheet();
+  var data = createSheet.getDataRange().getValues();
+
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][3] === projectName &&
+        String(data[i][5]) === String(leaderId) &&
+        data[i][8] === "승인" &&
+        data[i][9] === "미반납") {
+      if (data[i][1] !== name || data[i][2] !== email) return "mismatch";
+      return "ok";
+    }
+  }
+  return "not_found";
+}
