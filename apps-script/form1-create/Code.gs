@@ -31,8 +31,8 @@ function onSubmit(e) {
   var botToken = "<SLACK_BOT_TOKEN>";
   var channelId = "<SLACK_CHANNEL_ID>";
   var responses = e.values;
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var lastRow = sheet.getLastRow();
+  var sheet = e.range.getSheet();
+  var lastRow = e.range.getRow();
   if (sheet.getRange(lastRow, 9).getValue() !== "") return; // 중복 발화 방지
 
   // 1. 개인정보 미동의
@@ -82,7 +82,7 @@ function onSubmit(e) {
   }
 
   // 5. 대표자 ID 영문+숫자 검증
-  if (!/^[a-zA-Z0-9]+$/.test(responses[5])) {
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9-]*$/.test(responses[5])) {
     sheet.getRange(lastRow, 9).setValue("실패-ID오류");
     sendEmailSafe(responses[2], "[HighCloud] 프로젝트 생성 신청 실패",
       "안녕하세요, " + responses[1] + "님.\n\n프로젝트 생성 신청이 실패하였습니다.\n\n사유: 대표자 ID는 영문과 숫자만 입력해주세요.\n입력하신 ID: " + responses[5] + "\n\n감사합니다.");
