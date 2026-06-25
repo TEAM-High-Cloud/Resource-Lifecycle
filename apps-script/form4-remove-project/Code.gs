@@ -58,6 +58,28 @@ function onSubmit(e) {
     return;
   }
 
+  var leaderCheck = checkLeaderIdentity(responses[3], responses[4], responses[1], responses[2]);
+  if (leaderCheck === "not_found") {
+    sheet.getRange(lastRow, 8).setValue("실패-없는대표ID");
+    sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n프로젝트 삭제 신청이 실패하였습니다.\n\n사유: 해당 프로젝트의 대표자 정보와 일치하지 않습니다. 프로젝트 삭제는 대표자만 신청할 수 있습니다.\n프로젝트명: " + responses[3] + "\n입력하신 대표자 ID: " + responses[4] + "\n\n감사합니다.");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 프로젝트 삭제 신청 실패*\n*사유:* 해당 프로젝트의 대표자 개인정보와 일치하지 않습니다\n*프로젝트명:* " + responses[3] + "\n*입력하신 대표자 ID:* " + responses[4] + "\n*입력하신 성함:* " + responses[1] + "\n*입력하신 이메일:* " + responses[2] })
+    });
+    return;
+  }
+  if (leaderCheck === "mismatch") {
+    sheet.getRange(lastRow, 8).setValue("실패-정보불일치");
+    sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n프로젝트 삭제 신청이 실패하였습니다.\n\n사유: 대표자 ID는 존재하지만 성함 또는 이메일이 등록 정보와 일치하지 않습니다.\n프로젝트명: " + responses[3] + "\n대표자 ID: " + responses[4] + "\n\n감사합니다.");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 프로젝트 삭제 신청 실패*\n*사유:* 대표자 ID는 존재하지만 성함 또는 이메일이 등록 정보와 일치하지 않습니다\n*프로젝트명:* " + responses[3] + "\n*대표자 ID:* " + responses[4] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
+
   sheet.getRange(lastRow, 8).setValue("대기중");
 
   var blocks = [
