@@ -48,6 +48,28 @@ function onSubmit(e) {
     return;
   }
 
+  var deleteCheck = checkDeleteUserIdentity(responses[3], responses[4], responses[1], responses[2]);
+  if (deleteCheck === "not_found") {
+    sheet.getRange(lastRow, 7).setValue("실패-없는ID");
+    sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n유저 삭제 신청이 실패하였습니다.\n\n사유: 해당 프로젝트에 존재하지 않는 유저 ID입니다.\n프로젝트명: " + responses[3] + "\n유저 ID: " + responses[4] + "\n\n감사합니다.");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 유저 삭제 신청 실패*\n*사유:* 해당 프로젝트에 존재하지 않는 ID입니다\n*프로젝트명:* " + responses[3] + "\n*삭제할 유저 ID:* " + responses[4] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
+  if (deleteCheck === "mismatch") {
+    sheet.getRange(lastRow, 7).setValue("실패-정보불일치");
+    sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n유저 삭제 신청이 실패하였습니다.\n\n사유: 유저 ID는 존재하지만 성함 또는 이메일이 등록 정보와 일치하지 않습니다.\n프로젝트명: " + responses[3] + "\n유저 ID: " + responses[4] + "\n\n감사합니다.");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 유저 삭제 신청 실패*\n*사유:* ID는 존재하지만 성함 또는 이메일이 등록 정보와 일치하지 않습니다\n*프로젝트명:* " + responses[3] + "\n*삭제할 유저 ID:* " + responses[4] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
+
   sheet.getRange(lastRow, 7).setValue("대기중");
 
   var blocks = [
@@ -87,4 +109,33 @@ function getProjectStatus(projectName) {
   }
   if (hasPending) return "대기중";
   return "없음";
+}
+
+function checkDeleteUserIdentity(projectName, userId, name, email) {
+  var createSheet = SpreadsheetApp.openById("<CREATE_SHEET_ID>").getActiveSheet();
+  var addSheet = SpreadsheetApp.openById("<ADD_SHEET_ID>").getActiveSheet();
+  var createData = createSheet.getDataRange().getValues();
+  var addData = addSheet.getDataRange().getValues();
+
+  for (var i = 1; i < createData.length; i++) {
+    if (createData[i][3] === projectName &&
+        String(createData[i][5]) === String(userId) &&
+        createData[i][8] === "승인" &&
+        createData[i][9] === "미반납" &&
+        createData[i][10] !== "탈퇴") {
+      if (createData[i][1] !== name || createData[i][2] !== email) return "mismatch";
+      return "ok";
+    }
+  }
+  for (var i = 1; i < addData.length; i++) {
+    if (addData[i][3] === projectName &&
+        String(addData[i][4]) === String(userId) &&
+        addData[i][6] === "승인" &&
+        addData[i][7] === "미반납" &&
+        addData[i][8] !== "탈퇴") {
+      if (addData[i][1] !== name || addData[i][2] !== email) return "mismatch";
+      return "ok";
+    }
+  }
+  return "not_found";
 }
