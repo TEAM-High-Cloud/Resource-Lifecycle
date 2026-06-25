@@ -16,15 +16,34 @@ function sendEmailSafe(to, subject, body) {
   }
 }
 
+// 비밀번호 검증: FastAPI /verify-password 호출 → 맞으면 true
+function verifyPasswordViaAPI(fastapiUrl, userId, password) {
+  try {
+    var response = UrlFetchApp.fetch(fastapiUrl + "/verify-password", {
+      "method": "post",
+      "contentType": "application/json",
+      "payload": JSON.stringify({ "user_id": userId, "password": password }),
+      "muteHttpExceptions": true
+    });
+    var result = JSON.parse(response.getContentText());
+    return result.status === "success" && result.valid === true;
+  } catch (err) {
+    return false; // 통신 실패 시 삭제 차단 (fail-safe)
+  }
+}
+
 function onSubmit(e) {
   var webhookUrl = "<SLACK_WEBHOOK_URL>";
   var botToken = "<SLACK_BOT_TOKEN>";
   var channelId = "<SLACK_CHANNEL_ID>";
+  var fastapiUrl = "<FASTAPI_URL>";
   var responses = e.values;
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var lastRow = sheet.getLastRow();
   if (sheet.getRange(lastRow, 8).getValue() !== "") return;
   var FAIL_SUBJECT = "[HighCloud] 프로젝트 삭제 신청 실패";
+
+  var inputPassword = responses[6];
 
   // 마지막 확인 "아니오" → 취소 (실패 아님, 메일 미발송)
   if (responses[5] === "아니오") {
@@ -76,6 +95,17 @@ function onSubmit(e) {
     UrlFetchApp.fetch(webhookUrl, {
       "method": "post", "contentType": "application/json",
       "payload": JSON.stringify({ "text": "*❌ 프로젝트 삭제 신청 실패*\n*사유:* 대표자 ID는 존재하지만 성함 또는 이메일이 등록 정보와 일치하지 않습니다\n*프로젝트명:* " + responses[3] + "\n*대표자 ID:* " + responses[4] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
+    });
+    return;
+  }
+
+  if (!verifyPasswordViaAPI(fastapiUrl, responses[4], inputPassword)) {
+    sheet.getRange(lastRow, 8).setValue("실패-비번불일치");
+    sendEmailSafe(responses[2], FAIL_SUBJECT,
+      "안녕하세요, " + responses[1] + "님.\n\n프로젝트 삭제 신청이 실패하였습니다.\n\n사유: 비밀번호가 일치하지 않습니다.\n프로젝트명: " + responses[3] + "\n대표자 ID: " + responses[4] + "\n\n감사합니다.");
+    UrlFetchApp.fetch(webhookUrl, {
+      "method": "post", "contentType": "application/json",
+      "payload": JSON.stringify({ "text": "*❌ 프로젝트 삭제 신청 실패*\n*사유:* 비밀번호가 일치하지 않습니다\n*프로젝트명:* " + responses[3] + "\n*대표자 ID:* " + responses[4] + "\n*성함:* " + responses[1] + "\n*이메일:* " + responses[2] })
     });
     return;
   }
