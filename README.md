@@ -76,7 +76,7 @@ CSP 플랫폼 사용자를 이 도메인에 그대로 추가하지 않고, 사�
 
 Keystone의 에서 제공되는 주요 role은 Admin과 Member입니다. Highcloud 자원 생성 회수는 프로젝트의 팀장(사용자)만의 권한이기 때문에 Leader라는 custom role을 만들어, Admin과 Member의 중간 권한을 가지게 했습니다.
 
-<img width="1000" alt="image" src="https://github.com/user-attachments/assets/e703f95a-339c-4837-a250-a205f2211d49" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/e703f95a-339c-4837-a250-a205f2211d49" />
 
 
 #### 권한 검증 지점 — Gating Flow
