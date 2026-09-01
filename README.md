@@ -68,14 +68,15 @@ CSP 플랫폼 사용자를 이 도메인에 그대로 추가하지 않고, 사�
 2. 모든 사용자의 권한을 통제 가능 - 소속 사용자 전원의 인증을 제한할 수 있습니다. 보안 사고 대응이나 운영 종료 시 계정을 골라서 제한할 필요가 없고, 서비스 계정은 Default에 있어 클러스터는 정상 동작합니다.
 3. 감사 로그의 요청 주체가 구분 - 토큰과 감사 이벤트에 도메인 정보가 포함되므로, 사용자가 일으킨 요청과 서비스 컴포넌트가 일으킨 요청을 도메인 ID로 나눠 볼 수 있습니다. 장애 분석 시 사용자 행위와 시스템 동작을 분리하는 기준선이 됩니다.
 
-<img width="522" height="392" alt="image" src="https://github.com/user-attachments/assets/9c39afd3-ee25-4eb8-b63c-5aa6ce3e239f" />
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/9c39afd3-ee25-4eb8-b63c-5aa6ce3e239f" />
 
+---
 
 ### 2. RBAC 설계 구현
 
 Keystone의 에서 제공되는 주요 role은 Admin과 Member입니다. Highcloud 자원 생성 회수는 프로젝트의 팀장(사용자)만의 권한이기 때문에 Leader라는 custom role을 만들어, Admin과 Member의 중간 권한을 가지게 했습니다.
 
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/e703f95a-339c-4837-a250-a205f2211d49" />
+<img width="1000" alt="image" src="https://github.com/user-attachments/assets/e703f95a-339c-4837-a250-a205f2211d49" />
 
 
 #### 권한 검증 지점 — Gating Flow
@@ -83,15 +84,19 @@ Keystone의 에서 제공되는 주요 role은 Admin과 Member입니다. Highclo
 Role을 정의하는 것만으로는 의미가 없고, **요청이 실제 리소스에 닿기 전에 걸러내야** 합니다. 신청 파이프라인 앞단(Apps Script 유효성 검사 12번 항목)에서 신청자의 Role을 조회해 게이팅하도록 구현했습니다.
 
 
-<img width="1000" alt="image" src="https://github.com/user-attachments/assets/b8a893d9-bdac-4eac-bd63-da4e0e6852e2" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/b8a893d9-bdac-4eac-bd63-da4e0e6852e2" />
 
 
 권한이 없는 요청은 **관리자에게 Slack 알림이 가지 않고** 앞단(Apps script)에서 끝나며, 사용자에게는 거절 이유가 포함된 이메일이 전송됩니다.
 
 
+---
+
 ### 3. 프로젝트 LifeCycle 자동화
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/a9fb3b70-a54d-4a2c-bd29-96383084cd04" />
+
+
 
 
 프로젝트/사용자 **생성·삭제 신청 → 승인 → 실제 리소스 반영 → 결과 통보**의 업무 효율을 높이기 위해 LifeCycle을 설계했습니다. 아래는 그 아키텍처입니다.
@@ -100,11 +105,19 @@ Role을 정의하는 것만으로는 의미가 없고, **요청이 실제 리소
 <img width="1000" alt="image" src="https://github.com/user-attachments/assets/34cc0123-c3a5-4ce0-a294-73d5795cfede" />
 
 
+
+
 **Apps Script 유효성 검사 12개 항목**
 
 <img width="1000" alt="image" src="https://github.com/user-attachments/assets/5cf30e8f-bbc5-457c-b40f-60be34db854d" />
 
+
+
 **Role 기반 게이팅** — 유효성 검사를 RBAC와 연결해, 프로젝트 삭제는 Leader만 실행 가능하고 Member가 신청하면 자동으로 거절 사유가 담긴 이메일이 발송되도록 처리했습니다.
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/50afe480-b272-42fb-943e-07eff5e06737" />
+
+
+---
 
 ### 4. OpenStack SDK 기술 선택과 근거
 
@@ -123,7 +136,7 @@ Fast API 서버가 OpenStack과 통신할 때, RestAPI가 아닌 OpenStack SDK�
 
 외부 트래픽은 HAProxy 한 곳으로만 진입하고, OpenStack API는 내부망 밖으로 나갈 수 없도록 구성했습니다.
 
-<img width="3523" height="485" alt="image" src="https://github.com/user-attachments/assets/a6c49c62-e918-474b-b8ae-72588318ec66" />
+<img width="1000" alt="image" src="https://github.com/user-attachments/assets/a6c49c62-e918-474b-b8ae-72588318ec66" />
 
 - **보안 격리** — Keystone 외부 노출 차단, admin 자격증명을 내부에 고정, Bastion 역할의 Gateway
 - **비즈니스 로직 제어** — raw 호출을 도메인 API로 감싸 검증/승인/알림을 한곳에서 관리, 프론트와 OpenStack 분리
