@@ -14,7 +14,7 @@ AWS 같은 퍼블릭 클라우드는 리전 선택, IAM 정책 설계, 인스턴
 HighCloud는 **복잡한 설정을 플랫폼이 대신 처리하고, 사용자는 클릭 몇 번으로 VM 자원을 신청·사용**할 수 있는 CSP를 목표로 했습니다.
 
 <img width="600" alt="image" src="https://github.com/user-attachments/assets/512c88eb-564c-4fd2-bc84-f6bdc9e58002" />
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/68a99423-3852-467f-8670-ac6d657aa19b" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/68a99423-3852-467f-8670-ac6d657aa19b" />
 
 | 사용자 | 관리자 |
 |---|---|
