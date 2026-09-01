@@ -26,7 +26,7 @@ HighCloud는 **복잡한 설정을 플랫폼이 대신 처리하고, 사용자�
 
 On-Premise 클러스터(OpenStack + FastAPI + Ceph)와 Public Cloud(AWS 기반 Observability·AI agent)를 Multi-Bridge로 연결한 하이브리드 구조입니다.
 
-<img width="1000" height="1936" alt="image" src="https://github.com/user-attachments/assets/f8835ff6-4962-47ce-9e87-d125dc61c300" />
+<img width="1000" alt="image" src="https://github.com/user-attachments/assets/f8835ff6-4962-47ce-9e87-d125dc61c300" />
 
 
 ---
@@ -83,7 +83,7 @@ Keystone의 에서 제공되는 주요 role은 Admin과 Member입니다. Highclo
 Role을 정의하는 것만으로는 의미가 없고, **요청이 실제 리소스에 닿기 전에 걸러내야** 합니다. 신청 파이프라인 앞단(Apps Script 유효성 검사 12번 항목)에서 신청자의 Role을 조회해 게이팅하도록 구현했습니다.
 
 
-<img width="1965" height="1227" alt="image" src="https://github.com/user-attachments/assets/b8a893d9-bdac-4eac-bd63-da4e0e6852e2" />
+<img width="1000" alt="image" src="https://github.com/user-attachments/assets/b8a893d9-bdac-4eac-bd63-da4e0e6852e2" />
 
 
 권한이 없는 요청은 **관리자에게 Slack 알림이 가지 않고** 앞단(Apps script)에서 끝나며, 사용자에게는 거절 이유가 포함된 이메일이 전송됩니다.
