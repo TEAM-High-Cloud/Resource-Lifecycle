@@ -3,6 +3,7 @@
 > **VM·컨테이너 자원 할당을 위한 CSP 플랫폼**
 
 **개발 기간** 2026.04 ~ 2026.06 · **팀** 5인 · **소속** 현대오토에버 모빌리티 SW스쿨 클라우드 3기
+
 담당 파트 - 프로젝트 LifeCycle 자동화(FastAPI서버 · OpenStack SDK · Apps Script) / 도메인 격리 및 RBAC 구현
 
 ---
@@ -13,7 +14,7 @@ AWS 같은 퍼블릭 클라우드는 리전 선택, IAM 정책 설계, 인스턴
 HighCloud는 **복잡한 설정을 플랫폼이 대신 처리하고, 사용자는 클릭 몇 번으로 VM 자원을 신청·사용**할 수 있는 CSP를 목표로 했습니다.
 
 <img width="600" alt="image" src="https://github.com/user-attachments/assets/512c88eb-564c-4fd2-bc84-f6bdc9e58002" />
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/68a99423-3852-467f-8670-ac6d657aa19b" />
+<img width="300" alt="image" src="https://github.com/user-attachments/assets/68a99423-3852-467f-8670-ac6d657aa19b" />
 
 | 사용자 | 관리자 |
 |---|---|
@@ -25,7 +26,8 @@ HighCloud는 **복잡한 설정을 플랫폼이 대신 처리하고, 사용자�
 
 On-Premise 클러스터(OpenStack + FastAPI + Ceph)와 Public Cloud(AWS 기반 Observability·AI agent)를 Multi-Bridge로 연결한 하이브리드 구조입니다.
 
-<img width="941" height="530" alt="image" src="https://github.com/user-attachments/assets/7a7eafcf-5ab5-4148-85d2-7caef5a6a160" />
+<img width="1000" height="1936" alt="image" src="https://github.com/user-attachments/assets/f8835ff6-4962-47ce-9e87-d125dc61c300" />
+
 
 ---
 
