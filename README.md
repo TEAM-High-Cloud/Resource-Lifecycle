@@ -114,7 +114,8 @@ Role을 정의하는 것만으로는 의미가 없고, **요청이 실제 리소
 
 
 **Role 기반 게이팅** — 유효성 검사를 RBAC와 연결해, 프로젝트 삭제는 Leader만 실행 가능하고 Member가 신청하면 자동으로 거절 사유가 담긴 이메일이 발송되도록 처리했습니다.
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/50afe480-b272-42fb-943e-07eff5e06737" />
+
+<img width="650" alt="image" src="https://github.com/user-attachments/assets/50afe480-b272-42fb-943e-07eff5e06737" />
 
 
 ---
